@@ -19,5 +19,5 @@ app.get('/',(req,res)=>{
 
 
 app.listen(port, ()=>{
-    console.log(`Backend is running on ${port}`);
+    console.log(`iNotebook Backend is running on ${port}`);
 })
