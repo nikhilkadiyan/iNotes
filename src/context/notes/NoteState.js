@@ -68,14 +68,7 @@ const NoteState = (props) => {
     });
     const updatedNote = await response.json();
     console.log(updatedNote);
-    //Logic to edit in client
-    for (let i = 0; i < notes.length; i++) {
-      if (notes[i]._id === id) {
-        notes[i].title = title;
-        notes[i].description = description;
-        notes[i].tag = tag;
-      }
-    }
+    getAllNotes();
   }
 
   return (
