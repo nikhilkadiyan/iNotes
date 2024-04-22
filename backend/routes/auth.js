@@ -14,7 +14,7 @@ const router = express.Router();
 router.post('/createuser',
 [body('name').isLength({min: 3}),body('email').isEmail(),body('password').isLength({min: 5})],
 async(req,res)=>{
-    
+    let success = false;
     //If there are errors return bad request and the errors.
     const result = validationResult(req);
     if(!result.isEmpty()){
@@ -25,7 +25,7 @@ async(req,res)=>{
         //check wheather the user with this email exists already.
         let user = await User.findOne({email: req.body.email});
         if(user){
-            return res.status(400).json({error: "Sorry the user with this email already exists."})
+            return res.status(400).json({success: success,error: "Sorry the user with this email already exists."})
         }
 
         const securePass = await bcrypt.hash(req.body.password, saltRounds); 
@@ -41,10 +41,9 @@ async(req,res)=>{
                 id: user.id
             }
         }
-
+        success= true;
         const authToken = jwt.sign(data,JWT_SECRET);
-        // res.json(user);
-        res.json({token: authToken});
+        res.json({success: success,authToken});
     }catch (error){
         console.error(error.message);
         res.status(500).send("Internal Server Error.");
@@ -55,7 +54,7 @@ async(req,res)=>{
 router.post('/login',
 [body('email').isEmail(),body('password').exists()],
 async(req,res)=>{
-    
+    let success = false;
     //If there are errors return bad request and the errors.
     const result = validationResult(req);
     if(!result.isEmpty()){
@@ -67,13 +66,13 @@ async(req,res)=>{
         //check wheather the user with this email exists already.
         let user = await User.findOne({email: email});
         if(!user){
-            return res.status(400).json({error: "Please try to login with correct credentials."})
+            return res.status(400).json({success: success,error: "Please try to login with correct credentials."})
         }
 
         const passCompare = await bcrypt.compare(password, user.password); 
         
         if(!passCompare){
-            return res.status(400).json({error: "Please try to login with correct credentials."})
+            return res.status(400).json({success: success,error: "Please try to login with correct credentials."})
         }
 
         const data = {
@@ -83,8 +82,8 @@ async(req,res)=>{
         }
 
         const authToken = jwt.sign(data,JWT_SECRET);
-        // res.json(user);
-        res.json({token: authToken});
+        success= true;
+        res.json({success:success,authToken});
     }catch (error){
         console.error(error.message);
         res.status(500).send("Internal Server Error.");
